@@ -23,6 +23,6 @@ Word.prototype.searchWord = function(character) {
     }
 }
 
-module.export = {
+module.exports = {
     Word: Word
 }
