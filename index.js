@@ -11,24 +11,24 @@ function generateWord() {
     var randomNum;
     do {
         var found = false;
-        console.log('entered do while loop');
+        //console.log('entered do while loop');
         if (chosenWords.length === wordArray.length) {
             chosenWords = [];
         }
         randomNum = Math.floor(Math.random() * wordArray.length);
-        console.log(randomNum);
+        //console.log(randomNum);
         var i = 0;
         while (i < chosenWords.length && !found) {
-            console.log('entered nested while loop');
+            //console.log('entered nested while loop');
             if (chosenWords[i] === randomNum) {
-                console.log('entered if statement');
+               // console.log('entered if statement');
                 found = true;
             } else {
                 i++;
             }
         }
     } while (found);
-    console.log('exit do while loop');
+   // console.log('exit do while loop');
     chosenWords.push(randomNum);
     return new word.Word(wordArray[randomNum]);
 }
@@ -41,11 +41,18 @@ function generateWord() {
 //checks to see if player won/lost
 function iteration(myWord, numGuesses) {
     console.log(myWord.returnString());
-    console.log('# Guesses: ' + numGuesses);
+    console.log('Guesses Remaining: ' + numGuesses);
     var isFound = true;
     inquirer.prompt({
         name: 'guessLetter',
-        message: 'Enter your guess: '
+        message: 'Enter your guess: ',
+        validate: function(name) {
+            if (name.length > 1 || (name.charCodeAt(0) < 97 || name.charCodeAt(0) > 122)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     }).then(function(reply) {
         var i = 0;
         var previouslyGuessed = false;
@@ -61,7 +68,7 @@ function iteration(myWord, numGuesses) {
             iteration(myWord, numGuesses);
         } else {
             guessedLetters.push(reply.guessLetter);
-            numGuesses++;
+            numGuesses--;
             myWord.searchWord(reply.guessLetter);
             console.log(myWord.returnString());
             i = 0;
@@ -72,13 +79,13 @@ function iteration(myWord, numGuesses) {
                     i++;
                 }
             }
-            if (numGuesses < MAX_GUESSES && !isFound) {
+            if (numGuesses > 0 && !isFound) {
                 iteration(myWord, numGuesses);
-            } else if (isFound && numGuesses < MAX_GUESSES) {
+            } else if (isFound && numGuesses > 0) {
                 console.log('You win');
                 guessedLetters = [];
                 playAgain();
-            } else if (numGuesses === MAX_GUESSES) {
+            } else if (numGuesses === 0) {
                 console.log('You lose');
                 guessedLetters = [];
                 playAgain();
@@ -95,10 +102,10 @@ function playAgain() {
         type: 'confirm'
     }).then(function(response) {
         if (response.again) {
-            iteration(generateWord(), 0);
+            iteration(generateWord(), MAX_GUESSES);
         }
     });
 }
 
  
-iteration(generateWord(), 0);
+iteration(generateWord(), MAX_GUESSES);
